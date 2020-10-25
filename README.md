@@ -1,4 +1,4 @@
-# Finite-Element-Machine
+# Finite Element Machine (FEMa)
 
 Finite Element Machine Classifier
 
