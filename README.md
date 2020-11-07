@@ -1,4 +1,4 @@
-# Finite Element Machine (FEMa)
+# PyFEMa - Python API for Finite Element Machine
 
 Finite Element Machine Classifier
 
