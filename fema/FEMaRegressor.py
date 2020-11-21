@@ -1,11 +1,11 @@
 import numpy as np
 import math
 from scipy.spatial import distance
-from sklearn.base import BaseEstimator, ClassifierMixin
+from sklearn.base import BaseEstimator, RegressorMixin
 from sklearn.utils.validation import check_is_fitted
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import mean_squared_error
 
-class FEMaClassifier(BaseEstimator, ClassifierMixin):
+class FEMaRegressor(BaseEstimator, RegressorMixin):
     
     def __init__(self, z=3):
         self.z = z
@@ -14,33 +14,26 @@ class FEMaClassifier(BaseEstimator, ClassifierMixin):
         self._train_count = len(X)
         self._X_train = X
         self._y_train = y
-        self._class_count = len(np.unique(y))
         return self
     
-    def class_probability(self, xk, c, sum_dist_xk_all_train):
-        q = np.array([1 if y_tr == c else 0 for y_tr in self._y_train])
+    def probability(self, xk, sum_dist_xk_all_train):
+        q = np.array([y_tr for y_tr in self._y_train])# change
         b = np.array([self.shepard(xk, x_tr, sum_dist_xk_all_train) for x_tr in self._X_train])
         return np.dot(q, b)
     
-    def certainty(self, xk, class_index):
+    def sample_prob(self, xk):
         sum_dist_xk_all_train = np.sum([self.weight(xk, x_tr) for x_tr in self._X_train])
-        return self.class_probability(xk, class_index, sum_dist_xk_all_train)
-    
-    def predict_prob(self, X):
-        test_count = len(X)
-        prob = np.zeros((test_count, self._class_count))
-        
-        for k in range(test_count):
-            sum_dist_xk_all_train = np.sum([self.weight(X[k], x_tr) for x_tr in self._X_train])
-        
-            for c in range(self._class_count):
-                prob[k, c] += self.class_probability(X[k], c, sum_dist_xk_all_train)
-        return prob
+        return self.probability(xk, sum_dist_xk_all_train)
     
     def predict(self, X):
         check_is_fitted(self, '_train_count')
-        prob = self.predict_prob(X)
-        return np.array([np.argmax(p) for p in prob])
+        test_count = len(X)
+        prob = np.zeros(test_count)
+        
+        for k in range(test_count):
+            sum_dist_xk_all_train = np.sum([self.weight(X[k], x_tr) for x_tr in self._X_train])
+            prob[k] += self.probability(X[k], sum_dist_xk_all_train)
+        return prob
     
     def weight(self, xk, xj):
         # inverse_distance_weighting
@@ -52,7 +45,7 @@ class FEMaClassifier(BaseEstimator, ClassifierMixin):
     
     def score(self, X, y):
         self.fit(X, y)
-        return accuracy_score(y, self.predict(X))
+        return math.sqrt(mean_squared_error(y, self.predict(X)))
 
     def get_params(self, deep=True):
         return {'z': self.z}
