@@ -8,7 +8,7 @@ from sklearn.metrics import mean_squared_error
 class FEMaRegressor(BaseEstimator, RegressorMixin):
     
     def __init__(self, z=3):
-        self.z = z
+        self._z = z
     
     def fit(self, X, y):
         self._train_count = len(X)
@@ -16,42 +16,25 @@ class FEMaRegressor(BaseEstimator, RegressorMixin):
         self._y_train = y
         return self
     
-    def probability(self, xk, sum_dist_xk_all_train):
-        q = np.array([y_tr for y_tr in self._y_train])# change
-        b = np.array([self.shepard(xk, x_tr, sum_dist_xk_all_train) for x_tr in self._X_train])
-        return np.dot(q, b)
-    
-    def sample_prob(self, xk):
-        sum_dist_xk_all_train = np.sum([self.weight(xk, x_tr) for x_tr in self._X_train])
-        return self.probability(xk, sum_dist_xk_all_train)
-    
     def predict(self, X):
         check_is_fitted(self, '_train_count')
-        test_count = len(X)
-        prob = np.zeros(test_count)
-        
-        for k in range(test_count):
-            sum_dist_xk_all_train = np.sum([self.weight(X[k], x_tr) for x_tr in self._X_train])
-            prob[k] += self.probability(X[k], sum_dist_xk_all_train)
-        return prob
+        return np.fromiter((np.dot(self._y_train, self.shepard(xk, self._X_train)) for xk in X), dtype=float)
     
-    def weight(self, xk, xj):
-        # inverse_distance_weighting
-        dist = distance.euclidean(xk, xj) ** self.z
-        return (1.0 / dist) if dist != 0.0 else 1.0
-    
-    def shepard(self, xk, xi, sum_dist_xk_all_train):
-        return self.weight(xk, xi) / sum_dist_xk_all_train
+    def shepard(self, xk, X_train):
+        diff = xk - X_train
+        diff = np.where(diff == 0, 0.000001, diff) 
+        dist = np.linalg.norm(diff, axis=1)
+        idw = 1.0 / np.power(dist, self._z)
+        return idw / np.sum(idw)
     
     def score(self, X, y):
         self.fit(X, y)
         return math.sqrt(mean_squared_error(y, self.predict(X)))
 
     def get_params(self, deep=True):
-        return {'z': self.z}
+        return {'z': self._z}
 
     def set_params(self, **parameters):
         for parameter, value in parameters.items():
             setattr(self,parameter, value)
         return self
-    
