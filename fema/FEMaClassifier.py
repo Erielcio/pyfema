@@ -24,7 +24,7 @@ class FEMaClassifier(BaseEstimator, ClassifierMixin):
         for k in range(test_count):
             phi = self.shepard(X[k], self._X_train)
             for c in range(self._class_count):
-                prob_per_class[k, c] = np.dot(np.array([1 if y_tr == c else 0 for y_tr in self._y_train]), phi)
+                prob_per_class[k, c] = np.dot(np.fromiter((1 if y_tr == c else 0 for y_tr in self._y_train), dtype=float), phi)                
         return prob_per_class
     
     def predict(self, X):
