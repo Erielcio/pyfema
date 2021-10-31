@@ -26,7 +26,6 @@ pip install -r requirements.txt
 ```
 
 ## Usage
----
 Example of Classification Task.
 
 
@@ -48,13 +47,13 @@ clf.fit(X_train, y_train)
 y_pred = clf.predict(X_test)
 ```
 
-# Reference
+## Reference
 https://github.com/danillorp/libFemClassifier
 
-# Contributing
+## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
 Please make sure to update tests as appropriate.
 
-# License
+## License
 [MIT](https://choosealicense.com/licenses/mit/)
