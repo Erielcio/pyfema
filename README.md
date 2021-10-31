@@ -1,5 +1,5 @@
 # pyFEMa: Python API for Finite Element Machine
-pyFEMa is a [Finite Element Machine](https://github.com/danillorp/libFemClassifier) implemented using Scikit-Learn `sklearn.base.BaseEstimator`.
+pyFEMa is a [Finite Element Machine](https://github.com/danillorp/libFemClassifier) implementation using scikit-learn base estimator.
 
 pyFEMa has two estimators:
 
