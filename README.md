@@ -14,9 +14,7 @@ Estimator for Regression Task
 ## ~~Installation from binaries~~ (Pending)
 ~~Use the package manager [pip](https://pip.pypa.io/en/stable/) to install pyfema.~~
 
-```bash
-pip install pyfema
-```
+~~`pip install pyfema`~~
 
 ## Installation from source
 Install dependencies using:
